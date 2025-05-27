@@ -33,7 +33,7 @@ function AddProduct() {
     productType: "",
     tax: "",
     categoryId: "",
-    vendorId:"",
+    venderId:"",
     hsnCode: "",
     GTIN: "",
     shortDescription: "",
@@ -84,12 +84,12 @@ function AddProduct() {
     }
   };
 
-  const [vendorList, setVendorList] = useState([]);
-  const getVendorListFunc = async () => {
+  const [venderList, setVenderList] = useState([]);
+  const getVenderListFunc = async () => {
     try {
       let response = await getVenderListServ({ status: true });
       if (response?.data?.statusCode == "200") {
-        setVendorList(response?.data?.data);
+        setVenderList(response?.data?.data);
       }
     } catch (error) {
       console.log(error);
@@ -101,7 +101,7 @@ function AddProduct() {
     getProductListFunc();
     getTaxListFunc();
     getCategoryListFunc();
-    getVendorListFunc();
+    getVenderListFunc();
   }, []);
   const [loader, setLoader] = useState(false);
   const handleSubmit = async () => {
@@ -116,7 +116,7 @@ function AddProduct() {
           productType: formData?.productType,
           tax: formData?.tax,
           categoryId: formData?.categoryId,
-          vendorId: formData?.vendorId,
+          venderId: formData?.venderId,
           hsnCode: formData?.hsnCode,
           GTIN: formData?.GTIN,
           shortDescription: shortDescription,
@@ -129,7 +129,7 @@ function AddProduct() {
           productType: formData?.productType,
           tax: formData?.tax,
           categoryId: formData?.categoryId,
-          vendorId: formData?.vendorId,
+          venderId: formData?.venderId,
           madeIn: formData?.madeIn,
           hsnCode: formData?.hsnCode,
           GTIN: formData?.GTIN,
@@ -146,7 +146,7 @@ function AddProduct() {
           productType: "",
           tax: "",
           categoryId: "",
-          vendorId: "",
+          venderId: "",
           madeIn: "",
           hsnCode: "",
           GTIN: "",
@@ -278,17 +278,17 @@ function AddProduct() {
                   />
                 </div>
                 <div className="col-6 mb-3">
-                  <label>Vendor*</label>
+                  <label>Vender*</label>
                   <Select
                     isMulti
-                    options={vendorList?.map((v) => ({
+                    options={venderList?.map((v) => ({
                       label: v?.name,
                       value: v?._id,
                     }))}
                     onChange={(selectedOptions) =>
                       setFormData({
                         ...formData,
-                        vendorId: selectedOptions.map((option) => option.value),
+                        venderId: selectedOptions.map((option) => option.value),
                       })
                     }
                     className="basic-multi-select"
