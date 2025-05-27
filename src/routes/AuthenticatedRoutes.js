@@ -40,6 +40,7 @@ import ComboProductUpdateStep2 from '../Pages/Product/ComboProduct/ComboProductU
 import ComboProductUpdateStep3 from '../Pages/Product/ComboProduct/ComboProductUpdateStep3';
 import BulkOrderList from '../Pages/Order/BulkOrderList';
 import UserList from '../Pages/User/UserList';
+import VendorList from '../Pages/Vendor/VendorList';
 
 function AuthenticatedRoutes() {
   return (
@@ -122,6 +123,9 @@ function AuthenticatedRoutes() {
 
         {/* user routes */}
         <Route path="/user-list" element={<UserList/>}/>
+
+        {/* vendor routes  */}
+        <Route path='/vendor-list' element={<VendorList />} />
     </Routes>
   )
 }
