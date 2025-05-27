@@ -123,8 +123,14 @@ function AuthenticatedRoutes() {
 
         {/* user routes */}
         <Route path="/user-list" element={<UserList/>}/>
+<<<<<<< HEAD
         
         <Route path="/vendor-list" element={<VendorList/>}/>
+=======
+
+        {/* vendor routes  */}
+        <Route path='/vendor-list' element={<VendorList />} />
+>>>>>>> bb4b281d9afe6c0095bb06af8a2c90e6f67cc603
     </Routes>
   )
 }

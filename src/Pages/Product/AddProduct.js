@@ -14,6 +14,7 @@ import Select from "react-select";
 import { useGlobalState } from "../../GlobalProvider";
 import { useNavigate } from "react-router-dom";
 import { getCategoryServ } from "../../services/category.service";
+import { getVenderListServ } from "../../services/vender.services";
 function AddProduct() {
   const { globalState, setGlobalState } = useGlobalState();
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function AddProduct() {
     productType: "",
     tax: "",
     categoryId: "",
+    venderId:"",
     hsnCode: "",
     GTIN: "",
     shortDescription: "",
@@ -82,11 +84,24 @@ function AddProduct() {
     }
   };
 
+  const [venderList, setVenderList] = useState([]);
+  const getVenderListFunc = async () => {
+    try {
+      let response = await getVenderListServ({ status: true });
+      if (response?.data?.statusCode == "200") {
+        setVenderList(response?.data?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getTagListFunc();
     getProductListFunc();
     getTaxListFunc();
     getCategoryListFunc();
+    getVenderListFunc();
   }, []);
   const [loader, setLoader] = useState(false);
   const handleSubmit = async () => {
@@ -101,6 +116,7 @@ function AddProduct() {
           productType: formData?.productType,
           tax: formData?.tax,
           categoryId: formData?.categoryId,
+          venderId: formData?.venderId,
           hsnCode: formData?.hsnCode,
           GTIN: formData?.GTIN,
           shortDescription: shortDescription,
@@ -113,6 +129,7 @@ function AddProduct() {
           productType: formData?.productType,
           tax: formData?.tax,
           categoryId: formData?.categoryId,
+          venderId: formData?.venderId,
           madeIn: formData?.madeIn,
           hsnCode: formData?.hsnCode,
           GTIN: formData?.GTIN,
@@ -129,6 +146,7 @@ function AddProduct() {
           productType: "",
           tax: "",
           categoryId: "",
+          venderId: "",
           madeIn: "",
           hsnCode: "",
           GTIN: "",
@@ -253,6 +271,24 @@ function AddProduct() {
                       setFormData({
                         ...formData,
                         categoryId: selectedOptions.map((option) => option.value),
+                      })
+                    }
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                  />
+                </div>
+                <div className="col-6 mb-3">
+                  <label>Vender*</label>
+                  <Select
+                    isMulti
+                    options={venderList?.map((v) => ({
+                      label: v?.name,
+                      value: v?._id,
+                    }))}
+                    onChange={(selectedOptions) =>
+                      setFormData({
+                        ...formData,
+                        venderId: selectedOptions.map((option) => option.value),
                       })
                     }
                     className="basic-multi-select"
