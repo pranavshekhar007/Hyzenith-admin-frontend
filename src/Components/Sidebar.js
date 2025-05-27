@@ -79,6 +79,16 @@ function Sidebar({ selectedMenu, selectedItem }) {
         },
       ],
     },
+     {
+      menuIcon: "https://cdn-icons-png.flaticon.com/128/3946/3946106.png",
+      menu: "Franchise Stores",
+      subMenu: [
+        {
+          name: "Vendors",
+          path: "/vendor-list",
+        },
+      ],
+    },
     
     {
       menuIcon: "https://cdn-icons-png.flaticon.com/128/1601/1601521.png",

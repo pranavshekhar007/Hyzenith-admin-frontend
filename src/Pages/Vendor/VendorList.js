@@ -2,18 +2,24 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../../Components/Sidebar";
 import TopNav from "../../Components/TopNav";
 import {
-  getVenderListServ,
-  deleteVendorServ,
-} from "../../services/vender.services";
+  addCategoryServ,
+  deleteCategoryServ,
+  updateCategoryServ,
+} from "../../services/category.service";
+import {
+  getRoleListServ,
+  getAdminListServ,
+  addAdminServ,
+  deleteAdminServ,
+  updateAdminServ,
+} from "../../services/commandCenter.services";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import moment from "moment";
 import NoRecordFound from "../../Components/NoRecordFound";
-import { useNavigate } from "react-router-dom";
 function VendorList() {
-  const navigate = useNavigate();
   const [list, setList] = useState([]);
   const [statics, setStatics] = useState(null);
   const [payload, setPayload] = useState({
@@ -24,107 +30,139 @@ function VendorList() {
     sortByField: "",
   });
   const [showSkelton, setShowSkelton] = useState(false);
-  const handleGetVenderFunc = async () => {
+  const handleGetAdminFunc = async () => {
     if (list.length == 0) {
       setShowSkelton(true);
     }
     try {
-      let response = await getVenderListServ(payload);
+      let response = await getAdminListServ(payload);
       setList(response?.data?.data);
       setStatics(response?.data?.documentCount);
     } catch (error) {}
     setShowSkelton(false);
   };
-  const staticsArr = [
+   const staticsArr = [
     {
-      title: "Total Vendor",
+      title: "Total Vendors",
       count: statics?.totalCount,
       bgColor: "#6777EF",
     },
     {
-      title: "Active Vendor",
+      title: "Completed Profile",
       count: statics?.activeCount,
       bgColor: "#63ED7A",
     },
     {
-      title: "Pending Profiles",
+      title: "Incomplete Profile",
       count: statics?.inactiveCount,
       bgColor: "#FFA426",
     },
   ];
-  useEffect(() => {
-    handleGetVenderFunc();
-  }, [payload]);
-  const renderStatus = (profileStatus) => {
-    if (profileStatus == "incompleted") {
-      return (
-        <div className="badge py-2" style={{ background: "#FFCA2C" }}>
-          Profile Incompleted
-        </div>
-      );
+  const [roleList, setRoleList] = useState();
+  const handleGetRoleFunc = async () => {
+    if (list.length == 0) {
+      setShowSkelton(true);
     }
-    if (profileStatus == "otpVerified") {
-      return (
-        <div className="badge py-2" style={{ background: "#365B3A" }}>
-          OTP Verified
-        </div>
-      );
-    }
-    if (profileStatus == "storeDetailsCompleted") {
-      return (
-        <div className="badge py-2" style={{ background: "#23532A" }}>
-          Store Details Added
-        </div>
-      );
-    }
-    if (profileStatus == "completed") {
-      return (
-        <div className="badge py-2" style={{ background: "#63ED7A" }}>
-          Profile Completed
-        </div>
-      );
-    }
-    if (profileStatus == "approved") {
-      return (
-        <div className="badge py-2" style={{ background: "#157347" }}>
-          Active
-        </div>
-      );
-    }
-    if (profileStatus == "rejected") {
-      return (
-        <div className="badge py-2" style={{ background: "#FF0000" }}>
-          Rejected
-        </div>
-      );
-    }
-    if (profileStatus == "reUploaded") {
-      return (
-        <div className="badge py-2" style={{ background: "#6777EF" }}>
-          Re Uploaded
-        </div>
-      );
-    }
+    try {
+      let response = await getRoleListServ(payload);
+      setRoleList(response?.data?.data);
+    } catch (error) {}
+    setShowSkelton(false);
   };
-  const handleDeleteVenderFunc = async (id) => {
+  useEffect(() => {
+    handleGetAdminFunc();
+    handleGetRoleFunc();
+  }, [payload]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [addFormData, setAddFormData] = useState({
+    show: false,
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
+  const handleAddAdminFunc = async () => {
+    setIsLoading(true);
+    try {
+      let response = await addAdminServ(addFormData);
+      if (response?.data?.statusCode == "200") {
+        toast.success(response?.data?.message);
+        setAddFormData({
+          show: false,
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          password: "",
+        });
+        handleGetAdminFunc();
+      }
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message
+          ? error?.response?.data?.message
+          : "Internal Server Error"
+      );
+    }
+    setIsLoading(false);
+  };
+  const handleDeleteAdminFunc = async (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this Vendor?"
+      "Are you sure you want to delete this admin?"
     );
     if (confirmed) {
       try {
-        let response = await deleteVendorServ(id);
+        let response = await deleteAdminServ(id);
         if (response?.data?.statusCode == "200") {
-          toast.success(response?.data?.message);
-          handleGetVenderFunc();
+          toast?.success(response?.data?.message);
+          handleGetAdminFunc();
         }
       } catch (error) {
-        toast.error("Something went wrong");
+        toast.error(
+          error?.response?.data?.message
+            ? error?.response?.data?.message
+            : "Internal Server Error"
+        );
       }
     }
   };
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    image: "",
+    status: "",
+    _id: "",
+    imgPrev: "",
+    specialApperence: "",
+  });
+  const handleUpdateAdminFunc = async () => {
+    setIsLoading(true);
+    try {
+      let response = await updateAdminServ(editFormData);
+      if (response?.data?.statusCode == "200") {
+        toast.success(response?.data?.message);
+        setEditFormData({
+          name: "",
+          image: "",
+          status: "",
+          _id: "",
+          imgPrev: "",
+          specialApperence: "",
+        });
+        handleGetAdminFunc();
+      }
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message
+          ? error?.response?.data?.message
+          : "Internal Server Error"
+      );
+    }
+    setIsLoading(false);
+  };
   return (
     <div className="bodyContainer">
-      <Sidebar selectedMenu="Vendors" selectedItem="Manage Vendors" />
+      <Sidebar selectedMenu="Franchise Stores" selectedItem="Vendors" />
       <div className="mainContainer">
         <TopNav />
         <div className="p-lg-4 p-md-3 p-2">
@@ -158,7 +196,7 @@ function VendorList() {
             })}
           </div>
           <div className="row m-0 p-0 d-flex align-items-center my-4 topActionForm">
-            <div className="col-lg-2 mb-2 col-md-12 col-12">
+            <div className="col-lg-5 mb-2 col-md-12 col-12">
               <h3 className="mb-0 text-bold text-secondary">Vendors</h3>
             </div>
             <div className="col-lg-4 mb-2 col-md-12 col-12">
@@ -172,32 +210,13 @@ function VendorList() {
                 />
               </div>
             </div>
-            <div className="col-lg-3 mb-2  col-md-6 col-12">
-              <div>
-                <select
-                  className="form-control borderRadius24"
-                  onChange={(e) =>
-                    setPayload({ ...payload, status: e.target.value })
-                  }
-                >
-                  <option value="">Select Status</option>
-                  <option value="incompleted">Profile Incomplete</option>
-                  <option value="otpVerified">OTP Verified</option>
-                  <option value="storeDetailsCompleted">Store Details Completed</option>
-                  <option value="completed">Profile Completed</option>
-                  <option value="approved">Active</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="reUploaded">Reuploaded</option>
-                  
-                </select>
-              </div>
-            </div>
+
             <div className="col-lg-3 mb-2 col-md-6 col-12">
               <div>
                 <button
                   className="btn btn-primary w-100 borderRadius24"
                   style={{ background: "#6777EF" }}
-                  onClick={()=>alert("Work in progress")}
+                  onClick={() => setAddFormData({ ...addFormData, show: true })}
                 >
                   Add Vendor
                 </button>
@@ -216,11 +235,11 @@ function VendorList() {
                       >
                         Sr. No
                       </th>
-                      <th className="text-center py-3">Profile Picture</th>
-                      <th className="text-center py-3">First Name</th>
-                      <th className="text-center py-3">Last Name</th>
+                      <th className="text-center py-3">Profile Pic</th>
+                      <th className="text-center py-3">Name</th>
                       <th className="text-center py-3">Email</th>
                       <th className="text-center py-3">Phone</th>
+                      <th className="text-center py-3">Pincode</th>
                       <th className="text-center py-3">Status</th>
                       <th
                         className="text-center py-3 "
@@ -238,12 +257,12 @@ function VendorList() {
                                 <td className="text-center">
                                   <Skeleton width={50} height={50} />
                                 </td>
+
                                 <td className="text-center">
-                                  <Skeleton
-                                    width={50}
-                                    height={50}
-                                    borderRadius={25}
-                                  />
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                <td className="text-center">
+                                  <Skeleton width={100} height={25} />
                                 </td>
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
@@ -273,17 +292,24 @@ function VendorList() {
                             <>
                               <tr>
                                 <td className="text-center">{i + 1}</td>
-                                <td className="text-center">
-                                  <img
-                                    src={v?.profilePic}
-                                    style={{ height: "30px" }}
-                                  />
+                                <td className="font-weight-600 text-center">
+                                  <div>
+                                    <img
+                                      style={{
+                                        height: "50px",
+                                        width: "50px",
+                                        borderRadius: "50%",
+                                      }}
+                                      src={
+                                        v?.profilePic
+                                          ? v?.profilePic
+                                          : "https://cdn-icons-png.flaticon.com/128/1144/1144709.png"
+                                      }
+                                    />
+                                  </div>
                                 </td>
                                 <td className="font-weight-600 text-center">
-                                  {v?.firstName}
-                                </td>
-                                <td className="font-weight-600 text-center">
-                                  {v?.lastName}
+                                  {v?.firstName + " " + v?.lastName}
                                 </td>
                                 <td className="font-weight-600 text-center">
                                   {v?.email}
@@ -291,24 +317,34 @@ function VendorList() {
                                 <td className="font-weight-600 text-center">
                                   {v?.phone}
                                 </td>
-                                <td className="text-center">
-                                  {renderStatus(v?.profileStatus)}
+                                <td className="font-weight-600 text-center">
+                                  {v?.pincode}
                                 </td>
-
+                                <td className="font-weight-600 text-center">
+                                  {v?.status}
+                                </td>
                                 <td className="text-center">
                                   <a
-                                    className="btn btn-info  mx-2 text-light shadow-sm"
                                     onClick={() => {
-                                      navigate(`/vendor-approval/${v?._id}`);
+                                      setEditFormData({
+                                        firstName: v?.firstName,
+                                        lastName: v?.lastName,
+                                        email: v?.email,
+                                        phone: v?.phone,
+                                        password: v?.password,
+                                        role: v?.role,
+                                        _id: v?._id,
+                                      });
                                     }}
+                                    className="btn btn-info mx-2 text-light shadow-sm"
                                   >
-                                    View
+                                    Edit
                                   </a>
                                   <a
-                                    className="btn btn-warning mx-2 text-light shadow-sm"
                                     onClick={() =>
-                                      handleDeleteVenderFunc(v?._id)
+                                      handleDeleteAdminFunc(v?._id)
                                     }
+                                    className="btn btn-warning mx-2 text-light shadow-sm"
                                   >
                                     Delete
                                   </a>
@@ -326,6 +362,347 @@ function VendorList() {
           </div>
         </div>
       </div>
+      {addFormData?.show && (
+        <div
+          className="modal fade show d-flex align-items-center  justify-content-center "
+          tabIndex="-1"
+        >
+          <div className="modal-dialog">
+            <div
+              className="modal-content"
+              style={{
+                borderRadius: "16px",
+                background: "#f7f7f5",
+                width: "800px",
+              }}
+            >
+              <div className="d-flex justify-content-end pt-4 pb-0 px-4">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/128/9068/9068699.png"
+                  style={{ height: "20px" }}
+                  onClick={() =>
+                    setAddFormData({
+                      show: false,
+                      firstName: "",
+                      lastName: "",
+                      email: "",
+                      phone: "",
+                      password: "",
+                      role: "",
+                    })
+                  }
+                />
+              </div>
+              <div className="modal-body">
+                <div
+                  style={{
+                    wordWrap: "break-word",
+                    whiteSpace: "pre-wrap",
+                  }}
+                  className="d-flex justify-content-center w-100"
+                >
+                  <div className="w-100 px-2">
+                    <h5 className="mb-4">Add Vendor</h5>
+
+                    <div className="row">
+                      <div className="col-6">
+                        <label className="mt-3">First Name</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          onChange={(e) =>
+                            setAddFormData({
+                              ...addFormData,
+                              firstName: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="col-6">
+                        <label className="mt-3">Last Name</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          onChange={(e) =>
+                            setAddFormData({
+                              ...addFormData,
+                              lastName: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <label className="mt-3">Email</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      onChange={(e) =>
+                        setAddFormData({
+                          ...addFormData,
+                          email: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Phone</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      onChange={(e) =>
+                        setAddFormData({
+                          ...addFormData,
+                          phone: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Pincode</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      onChange={(e) =>
+                        setAddFormData({
+                          ...addFormData,
+                          pincode: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Password</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      onChange={(e) =>
+                        setAddFormData({
+                          ...addFormData,
+                          password: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Status</label>
+                    <select className="form-control">
+                      <option value="">Select</option>
+                      <option value={true}>Active</option>
+                      <option value={false}>Inactive</option>
+                    </select>
+                    <button
+                      className="btn btn-success w-100 mt-4"
+                      onClick={
+                        addFormData?.firstName &&
+                        addFormData?.lastName &&
+                        addFormData?.email &&
+                        addFormData?.phone &&
+                        addFormData?.password &&
+                        addFormData?.pincode &&
+                        !isLoading
+                          ? handleAddAdminFunc
+                          : undefined
+                      }
+                      disabled={
+                        !addFormData?.firstName &&
+                        !addFormData?.lastName &&
+                        !addFormData?.email &&
+                        !addFormData?.phone &&
+                        !addFormData?.password &&
+                        !addFormData?.pincode &&
+                        isLoading
+                      }
+                      style={{
+                        opacity:
+                          !addFormData?.firstName ||
+                          !addFormData?.lastName ||
+                          !addFormData?.email ||
+                          !addFormData?.phone ||
+                          !addFormData?.password ||
+                          !addFormData?.pincode ||
+                          isLoading
+                            ? "0.5"
+                            : "1",
+                      }}
+                    >
+                      {isLoading ? "Saving..." : "Submit"}
+                    </button>
+                  </div>
+                </div>
+                <div className="d-flex justify-content-center"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {addFormData?.show && <div className="modal-backdrop fade show"></div>}
+      {editFormData?._id && (
+        <div
+          className="modal fade show d-flex align-items-center  justify-content-center "
+          tabIndex="-1"
+        >
+          <div className="modal-dialog">
+            <div
+              className="modal-content"
+              style={{
+                borderRadius: "16px",
+                background: "#f7f7f5",
+                width: "800px",
+              }}
+            >
+              <div className="d-flex justify-content-end pt-4 pb-0 px-4">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/128/9068/9068699.png"
+                  style={{ height: "20px" }}
+                  onClick={() =>
+                    setEditFormData({
+                      _id: "",
+                      firstName: "",
+                      lastName: "",
+                      email: "",
+                      phone: "",
+                      password: "",
+                      role: "",
+                    })
+                  }
+                />
+              </div>
+              <div className="modal-body">
+                <div
+                  style={{
+                    wordWrap: "break-word",
+                    whiteSpace: "pre-wrap",
+                  }}
+                  className="d-flex justify-content-center w-100"
+                >
+                  <div className="w-100 px-2">
+                    <h5 className="mb-4">Update Vendor</h5>
+
+                    <div className="row">
+                      <div className="col-6">
+                        <label className="mt-3">First Name</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          value={editFormData?.firstName}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              firstName: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="col-6">
+                        <label className="mt-3">Last Name</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          value={editFormData?.lastName}
+                          onChange={(e) =>
+                            setEditFormData({
+                              ...editFormData,
+                              lastName: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <label className="mt-3">Email</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={editFormData?.email}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          email: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Phone</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={editFormData?.phone}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          phone: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Pincode</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={editFormData?.pincode}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          pincode: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Password</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={editFormData?.password}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          password: e.target.value,
+                        })
+                      }
+                    />
+                    <label className="mt-3">Status</label>
+                    <select className="form-control">
+                      <option value="">Select</option>
+                      <option value={true}>Active</option>
+                      <option value={false}>Inactive</option>
+                    </select>
+
+                    <button
+                      className="btn btn-success w-100 mt-4"
+                      onClick={
+                        editFormData?.firstName &&
+                        editFormData?.lastName &&
+                        editFormData?.email &&
+                        editFormData?.phone &&
+                        editFormData?.password &&
+                        editFormData?.role &&
+                        !isLoading
+                          ? handleUpdateAdminFunc
+                          : undefined
+                      }
+                      disabled={
+                        !editFormData?.firstName &&
+                        !editFormData?.lastName &&
+                        !editFormData?.email &&
+                        !editFormData?.phone &&
+                        !editFormData?.password &&
+                        !editFormData?.role &&
+                        isLoading
+                      }
+                      style={{
+                        opacity:
+                          !editFormData?.firstName ||
+                          !editFormData?.lastName ||
+                          !editFormData?.email ||
+                          !editFormData?.phone ||
+                          !editFormData?.password ||
+                          !editFormData?.role ||
+                          isLoading
+                            ? "0.5"
+                            : "1",
+                      }}
+                    >
+                      {isLoading ? "Updating..." : "Update"}
+                    </button>
+                  </div>
+                </div>
+                <div className="d-flex justify-content-center"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {editFormData?._id && <div className="modal-backdrop fade show"></div>}
     </div>
   );
 }
