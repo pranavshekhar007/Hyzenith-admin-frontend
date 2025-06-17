@@ -37,6 +37,7 @@ function AddProduct() {
     hsnCode: "",
     GTIN: "",
     shortDescription: "",
+    productApperence:""
   });
   const [tags, setTags] = useState([]);
   const getTagListFunc = async () => {
@@ -120,6 +121,7 @@ function AddProduct() {
           hsnCode: formData?.hsnCode,
           GTIN: formData?.GTIN,
           shortDescription: shortDescription,
+          productApperence:formData?.productApperence
         };
       }
       if (formData?.createdByAdmin == "No") {
@@ -135,6 +137,7 @@ function AddProduct() {
           GTIN: formData?.GTIN,
           shortDescription: shortDescription,
           createdBy: formData?.createdBy,
+          productApperence: formData?.productApperence
         };
       }
       let response = await addProductServ(finalPayload);
@@ -152,6 +155,7 @@ function AddProduct() {
           GTIN: "",
           createdBy: "",
           createdByAdmin: "",
+          productApperence:""
         });
         contentRef.current = "";
         setContent("");
@@ -164,7 +168,20 @@ function AddProduct() {
     }
     setLoader(false);
   };
-
+const [vendorList, setVendorList]=useState([]);
+  const getVendorListFunc =async ()=>{
+    try {
+      let response = await getVenderListServ({});
+      if(response?.data?.statusCode=="200"){
+        setVendorList(response?.data?.data)
+      }
+    } catch (error) {
+      
+    }
+  }
+  useEffect(()=>{
+    getVendorListFunc()
+  }, [])
   return (
     <div className="bodyContainer">
       <Sidebar selectedMenu="Product Management" selectedItem="Add Product" />
@@ -281,8 +298,8 @@ function AddProduct() {
                   <label>Vender*</label>
                   <Select
                     isMulti
-                    options={venderList?.map((v) => ({
-                      label: v?.name,
+                    options={vendorList?.map((v) => ({
+                      label: v?.firstName,
                       value: v?._id,
                     }))}
                     onChange={(selectedOptions) =>
@@ -317,20 +334,13 @@ function AddProduct() {
                 </div>
 
                 <div className="col-6 mb-3">
-                  <label>GTIN Code*</label>
-                  <input
-                    className="form-control"
-                    style={{ height: "45px" }}
-                    value={formData?.GTIN || ""}
-                    required
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (/^\d*$/.test(value)) {
-                        setFormData({ ...formData, GTIN: value });
-                      }
-                    }}
-                    
-                  />
+                  <label>Special Apperence</label>
+                  <select onChange={(e)=>setFormData({...formData, productApperence:e?.target?.value})} className="form-control">
+                    <option>Select</option>
+                    <option>Popular</option>
+                    <option>Best Seller</option>
+                  </select>
+                 
                 </div>
 
                 <div className="col-12 mb-3">

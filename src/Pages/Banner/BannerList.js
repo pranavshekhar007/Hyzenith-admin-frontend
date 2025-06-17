@@ -66,7 +66,7 @@ function BannerList() {
   const handleAddCategoryFunc = async () => {
     setIsLoading(true);
     const formData = new FormData();
-    formData?.append("name", addFormData?.name);
+    formData?.append("category", addFormData?.name);
     formData?.append("image", addFormData?.image);
     formData?.append("status", addFormData?.status);
     try {
@@ -285,7 +285,7 @@ function BannerList() {
                                   />
                                 </td>
                                 <td className="font-weight-600 text-center">
-                                  {v?.name}
+                                  {v?.category}
                                 </td>
                                 <td className="text-center">
                                   {v?.status ? (
@@ -377,12 +377,14 @@ function BannerList() {
                       type="file"
                       onChange={(e) => setAddFormData({ ...addFormData, image: e.target.files[0], imgPrev: URL.createObjectURL(e.target.files[0])})}
                     />
-                    <label className="mt-3">Name</label>
-                    <input
-                      className="form-control"
-                      type="text"
-                      onChange={(e) => setAddFormData({ ...addFormData, name: e.target.value })}
-                    />
+                    <label className="mt-3">Type</label>
+                    
+                    <select onChange={(e) => setAddFormData({ ...addFormData, name: e.target.value })} className="form-control">
+                      <option value="">Select</option>
+                      <option value="Home">Home</option>
+                      <option value="About">About</option>
+                      <option value="Gallery">Gallery</option>
+                    </select>
                     <label className="mt-3">Status</label>
                     <select
                       className="form-control"

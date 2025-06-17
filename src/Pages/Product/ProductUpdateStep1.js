@@ -14,7 +14,7 @@ import JoditEditor from "jodit-react";
 import { useParams, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { getCategoryServ } from "../../services/category.service";
-
+import { getVenderListServ } from "../../services/vender.services";
 function ProductUpdateStep1() {
   const params = useParams();
   const navigate = useNavigate();
@@ -35,6 +35,8 @@ function ProductUpdateStep1() {
     hsnCode: "",
     GTIN: "",
     shortDescription: "",
+    venderId: [],
+    productApperence: "",
   });
 
   const [tagOptions, setTagOptions] = useState([]);
@@ -101,9 +103,11 @@ function ProductUpdateStep1() {
           productType: product?.productType || "",
           tax: product?.tax || "",
           categoryId: product?.categoryId || [],
+          venderId: product?.venderId || [],
           hsnCode: product?.hsnCode || "",
           GTIN: product?.GTIN || "",
           shortDescription: product?.shortDescription || "",
+          productApperence: product?.productApperence,
         });
         setContent(product?.shortDescription || "");
         contentRef.current = product?.shortDescription || "";
@@ -138,6 +142,7 @@ function ProductUpdateStep1() {
           hsnCode: "",
           GTIN: "",
           shortDescription: "",
+          productApperence: "",
         });
         navigate("/update-product-step2/" + response?.data?.data?._id);
       } else {
@@ -148,10 +153,21 @@ function ProductUpdateStep1() {
     }
     setBtnLoader(false);
   };
-
+  const [vendorList, setVendorList] = useState([]);
+  const getVendorListFunc = async () => {
+    try {
+      let response = await getVenderListServ({});
+      if (response?.data?.statusCode == "200") {
+        setVendorList(response?.data?.data);
+      }
+    } catch (error) {}
+  };
+  useEffect(() => {
+    getVendorListFunc();
+  }, []);
   return (
     <div className="bodyContainer">
-      <Sidebar selectedMenu="Product Management" selectedItem="Add Product" />
+      <Sidebar selectedMenu="Product Management" />
       <div className="mainContainer">
         <TopNav />
         <div className="p-lg-4 p-md-3 p-2">
@@ -259,7 +275,29 @@ function ProductUpdateStep1() {
                     classNamePrefix="select"
                   />
                 </div>
-
+                <div className="col-6 mb-3">
+                  <label>Vendor* </label>
+                  <Select
+                    isMulti
+                    value={vendorList
+                      .filter((option) =>
+                        formData.venderId.includes(option._id)
+                      )
+                      .map((v) => ({ label: v.firstName, value: v._id }))}
+                    options={vendorList.map((v) => ({
+                      label: v.firstName,
+                      value: v._id,
+                    }))}
+                    onChange={(selectedOptions) =>
+                      setFormData({
+                        ...formData,
+                        venderId: selectedOptions.map((option) => option.value),
+                      })
+                    }
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                  />
+                </div>
                 <div className="col-6 mb-3">
                   <label>HSN Code*</label>
                   <input
@@ -280,21 +318,22 @@ function ProductUpdateStep1() {
                     <div className="invalid-feedback">{hsnError}</div>
                   )}
                 </div>
-
                 <div className="col-6 mb-3">
-                  <label>GTIN Code*</label>
-                  <input
+                  <label>Special Apperence</label>
+                  <select
+                  value={formData?.productApperence}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        productApperence: e?.target?.value,
+                      })
+                    }
                     className="form-control"
-                    style={{ height: "45px" }}
-                    value={formData?.GTIN || ""}
-                    required
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (/^\d*$/.test(value)) {
-                        setFormData({ ...formData, GTIN: value });
-                      }
-                    }}
-                  />
+                  >
+                    <option>Select</option>
+                    <option>Popular</option>
+                    <option>Best Seller</option>
+                  </select>
                 </div>
 
                 <div className="col-12 mb-3">

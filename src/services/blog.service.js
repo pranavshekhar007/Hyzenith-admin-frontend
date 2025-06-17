@@ -13,9 +13,9 @@ const getConfig = () => {
     },
   };
 };
-export const getVenderListServ = async (formData) => {
+export const getBlogListServ = async (formData) => {
   try {
-    const response = await axios.post(BASE_URL + "vender/list", formData);
+    const response = await axios.post(BASE_URL + "blog/list", formData);
     return response;
   } catch (error) {
     // Handle error (e.g., log or throw an error)
@@ -23,9 +23,13 @@ export const getVenderListServ = async (formData) => {
     throw error;
   }
 };
-export const updateVendorProfile = async (formData) => {
+export const addBlogServ = async (formData) => {
   try {
-    const response = await axios.put(BASE_URL + "vender/update", formData);
+    const response = await axios.post(
+      BASE_URL + "blog/create",
+      formData,
+      getConfig()
+    );
     return response;
   } catch (error) {
     // Handle error (e.g., log or throw an error)
@@ -33,9 +37,12 @@ export const updateVendorProfile = async (formData) => {
     throw error;
   }
 };
-export const deleteVendorServ = async (id) => {
+export const deleteBlogServ = async (id) => {
   try {
-    const response = await axios.delete(BASE_URL + "vender/delete/"+id);
+    const response = await axios.delete(
+      BASE_URL + "blog/delete/" + id,
+      getConfig()
+    );
     return response;
   } catch (error) {
     // Handle error (e.g., log or throw an error)
@@ -43,9 +50,26 @@ export const deleteVendorServ = async (id) => {
     throw error;
   }
 };
-export const createVendorServ = async (formData) => {
+export const updateBlogServ = async (formData) => {
   try {
-    const response = await axios.post(BASE_URL + "vender/create", formData);
+    const response = await axios.put(
+      BASE_URL + "blog/update",
+      formData,
+      getConfig()
+    );
+    return response;
+  } catch (error) {
+    // Handle error (e.g., log or throw an error)
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+export const getBlogDetailsServ = async (id) => {
+  try {
+    const response = await axios.get(
+      BASE_URL + "blog/details/"+ id,
+      
+    );
     return response;
   } catch (error) {
     // Handle error (e.g., log or throw an error)

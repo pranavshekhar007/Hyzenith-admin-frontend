@@ -18,7 +18,7 @@ function UserFaq() {
   const [statics, setStatics] = useState(null);
   const [payload, setPayload] = useState({
     searchKey: "",
-    category: "",
+    
     pageNo: 1,
     pageCount: 10,
     sortByField: "",
@@ -49,7 +49,7 @@ function UserFaq() {
   const [addFormData, setAddFormData] = useState({
     question: "",
     answer: "",
-    category: "user",
+    
   });
   const handleAddFaqFunc = async () => {
     setIsLoading(true);
@@ -60,7 +60,7 @@ function UserFaq() {
         setAddFormData({
           question: "",
           answer: "",
-          category: "",
+          
         });
         handleGetFaqFunc();
       }
@@ -96,7 +96,7 @@ function UserFaq() {
   const [editFormData, setEditFormData] = useState({
     question: "",
     answer: "",
-    category: "",
+    
     _id: "",
   });
   const handleUpdateFaqFunc = async () => {
@@ -108,7 +108,7 @@ function UserFaq() {
         setEditFormData({
           question:"",
           answer:"",
-          category:"",
+          
           _id: "",
         });
         handleGetFaqFunc();
@@ -122,38 +122,7 @@ function UserFaq() {
     }
     setIsLoading(false);
   };
-  const renderCategory = (category) => {
-    if (category == "user") {
-      return (
-        <button
-          className="badge"
-          style={{ height: "30px", background: "#6777EF", border:"none" }}
-        >
-          User
-        </button>
-      );
-    }
-    if (category == "driver") {
-      return (
-        <button
-          className="badge"
-          style={{ height: "30px", background: "#63ED7A", border:"none"}}
-        >
-          Driver
-        </button>
-      );
-    }
-    if (category == "vendor") {
-      return (
-        <button
-          className="badge"
-          style={{ height: "30px", background: "#FFA426", border:"none" }}
-        >
-          Vendor
-        </button>
-      );
-    }
-  };
+  
   return (
     <div className="bodyContainer">
       <Sidebar selectedMenu="System Support" selectedItem="FAQs" />
@@ -204,19 +173,7 @@ function UserFaq() {
                 />
               </div>
             </div>
-            <div className="col-lg-3 mb-2  col-md-6 col-12">
-              <div>
-                <select
-                  className="form-control borderRadius24"
-                  onChange={(e) =>
-                    setPayload({ ...payload, category: e.target.value })
-                  }
-                >
-                  <option value="">Select Category</option>
-                  <option value="user">User</option>
-                </select>
-              </div>
-            </div>
+            
             <div className="col-lg-3 mb-2 col-md-6 col-12">
               <div>
                 <button
@@ -243,7 +200,7 @@ function UserFaq() {
                       </th>
                       <th className="text-center py-3">Question</th>
                       <th className="text-center py-3">Answer</th>
-                      <th className="text-center py-3">Category</th>
+                  
                       <th
                         className="text-center py-3 "
                         style={{ borderRadius: "0px 30px 30px 0px" }}
@@ -270,9 +227,7 @@ function UserFaq() {
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
                                 </td>
-                                <td className="text-center">
-                                  <Skeleton width={100} height={25} />
-                                </td>
+                               
 
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
@@ -288,15 +243,13 @@ function UserFaq() {
                               <tr>
                                 <td className="text-center">{i + 1}</td>
 
-                                <td className="font-weight-600 text-center">
+                                <td className="font-weight-600 text-center" style={{width:"250px"}}>
                                   {v?.question}
                                 </td>
-                                <td className="font-weight-600 text-center">
+                                <td className="font-weight-600 text-center" style={{width:"500px"}}>
                                   {v?.answer}
                                 </td>
-                                <td className="text-center">
-                                  {renderCategory(v?.category)}
-                                </td>
+                               
 
                                 <td className="text-center">
                                   <a
@@ -304,7 +257,7 @@ function UserFaq() {
                                       setEditFormData({
                                         question:v?.question,
                                         answer:v?.answer,
-                                        category:v?.category,
+                                        
                                         _id: v?._id,
                                       });
                                     }}
@@ -356,7 +309,7 @@ function UserFaq() {
                     setAddFormData({
                       question: "",
                       answer: "",
-                      category: "",
+                     
                       show: false,
                     })
                   }
@@ -396,23 +349,10 @@ function UserFaq() {
                         })
                       }
                     />
-                    <label className="mt-3">Category</label>
-                    <select
-                      className="form-control"
-                      value={addFormData.category || "user"}
-                      onChange={(e) =>
-                        setAddFormData({
-                          ...addFormData,
-                          category: e.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Select Status</option>
-                      <option value="user">User</option>
-                    </select>
+                    
                     {addFormData?.question &&
-                    addFormData?.answer &&
-                    addFormData?.category ? (
+                    addFormData?.answer 
+                     ? (
                       <button
                         className="btn btn-success w-100 mt-4"
                         onClick={!isLoading && handleAddFaqFunc}
@@ -458,7 +398,7 @@ function UserFaq() {
                     setEditFormData({
                       question:"",
                       answer:"",
-                      category:"",
+                      
                       _id: "",
                     })
                   }
@@ -501,21 +441,8 @@ function UserFaq() {
                       }
                       value={editFormData?.answer}
                     />
-                  <label className="mt-3">Category</label>
-                    <select
-                      className="form-control"
-                      onChange={(e) =>
-                        setAddFormData({
-                          ...editFormData,
-                          category: e.target.value,
-                        })
-                      }
-                      value={editFormData?.category}
-                    >
-                      <option value="">Select Status</option>
-                      <option value="user">User</option>
-                    </select>
-                    {editFormData?.question && editFormData?.answer && editFormData?.category ? (
+                 
+                    {editFormData?.question && editFormData?.answer ? (
                       <button
                         className="btn btn-success w-100 mt-4"
                         onClick={!isLoading && handleUpdateFaqFunc}

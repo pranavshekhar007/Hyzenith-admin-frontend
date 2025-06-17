@@ -192,13 +192,10 @@ function ComboProductList() {
                       </th>
                       <th className="text-center py-3">Name</th>
                       <th className="text-center py-3">Image</th>
-                      
-                      <th className="text-center py-3">Type</th>
-                      <th className="text-center py-3">Product</th>
-                      <th className="text-center py-3">Price</th>
+                      <th className="text-center py-3">Products</th>
+                      <th className="text-center py-3">Combo Price</th>
                       <th className="text-center py-3">Stock</th>
                       <th className="text-center py-3">Status</th>
-
                       <th
                         className="text-center py-3 "
                         style={{ borderRadius: "0px 30px 30px 0px" }}
@@ -216,11 +213,18 @@ function ComboProductList() {
                                   <Skeleton width={50} height={50} />
                                 </td>
                                 <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                <td className="text-center">
                                   <Skeleton
                                     width={50}
                                     height={50}
                                     borderRadius={25}
                                   />
+                                </td>
+                                
+                                <td className="text-center">
+                                  <Skeleton width={100} height={25} />
                                 </td>
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
@@ -253,21 +257,16 @@ function ComboProductList() {
                                     style={{ height: "30px" }}
                                   />
                                 </td>
-                                
-
                                 <td className="text-center">
-                                  {v?.productType}
-                                </td>
-                                <td className="text-center">
-                                  {Array.isArray(v?.productId) &&
-                                  v.productId.length > 0 ? (
+                                  {Array.isArray(v?.productList) &&
+                                  v.productList.length > 0 ? (
                                     <ul className="list-unstyled mb-0 text-start d-inline-block">
-                                      {v?.productId.map((prod, idx) => (
+                                      {v?.productList.map((prod, idx) => (
                                         <li
                                           key={idx}
                                           className="mb-1 px-2 py-1 bg-light rounded text-dark"
                                         >
-                                          {prod.name}
+                                          {prod.productId?.name} : {prod.quantity}
                                         </li>
                                       ))}
                                     </ul>
@@ -277,41 +276,7 @@ function ComboProductList() {
                                 </td>
 
                                 <td className="text-center">
-                                  {v?.pricing?.offerPrice ? (
-                                    <div style={{ lineHeight: "1.2" }}>
-                                      <div
-                                        style={{
-                                          fontWeight: "bold",
-                                          fontSize: "16px",
-                                          color: "#28a745",
-                                        }}
-                                      >
-                                        {v?.pricing?.currency}{" "}
-                                        {v?.pricing?.offerPrice}
-                                      </div>
-                                      <div
-                                        style={{
-                                          textDecoration: "line-through",
-                                          color: "#888",
-                                          fontSize: "13px",
-                                          marginTop: "4px",
-                                        }}
-                                      >
-                                        {v?.pricing?.currency}{" "}
-                                        {v?.pricing?.actualPrice}
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div
-                                      style={{
-                                        fontWeight: "bold",
-                                        fontSize: "16px",
-                                      }}
-                                    >
-                                      {v?.pricing?.currency}{" "}
-                                      {v?.pricing?.actualPrice}
-                                    </div>
-                                  )}
+                                 {v?.comboPrice} INR
                                 </td>
 
                                 <td className="text-center">

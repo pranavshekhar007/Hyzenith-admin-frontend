@@ -6,6 +6,7 @@ import {
   updateProductServ,
   deleteProductServ,
 } from "../../services/product.services";
+import { getVenderListServ } from "../../services/vender.services";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
@@ -19,7 +20,7 @@ function ProductList() {
   const [statics, setStatics] = useState(null);
   const [payload, setPayload] = useState({
     searchKey: "",
-    status: "",
+    // status: "",
     pageNo: 1,
     pageCount: 10,
     sortByField: "",
@@ -99,6 +100,7 @@ function ProductList() {
       }
     }
   };
+
   return (
     <div className="bodyContainer">
       <Sidebar selectedMenu="Product Management" selectedItem="Products" />
@@ -189,10 +191,10 @@ function ProductList() {
                       </th>
                       <th className="text-center py-3">Name</th>
                       <th className="text-center py-3">Image</th>
-                      
-                      <th className="text-center py-3">Tax</th>
+
+                      <th className="text-center py-3">Appearance</th>
                       <th className="text-center py-3">Category</th>
-                     
+
                       <th className="text-center py-3">HSN Code</th>
                       <th className="text-center py-3">Price</th>
                       <th className="text-center py-3">Stock</th>
@@ -229,6 +231,18 @@ function ProductList() {
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
                                 </td>
+                                 <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                 <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                 <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                 <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
                                 </td>
@@ -251,19 +265,13 @@ function ProductList() {
                                     style={{ height: "30px" }}
                                   />
                                 </td>
-                              
 
-                               
-                                <td className="text-center">{v?.tax}</td>
+                                <td className="text-center">{v?.productApperence ? v?.productApperence: "None"}</td>
                                 <td className="text-center">
-                                  {Array.isArray(v?.categoryId)
-                                    ? v.categoryId
-                                        .map((cat) => cat.name)
-                                        .join(", ")
-                                    : v?.categoryId?.name || "-"}
+                                  {v?.categoryDetails?.map((v, i) => {
+                                    return <p>{v?.name}</p> 
+                                  })}
                                 </td>
-
-                                
 
                                 <td className="text-center">{v?.hsnCode}</td>
                                 <td className="text-center">{v?.price}</td>

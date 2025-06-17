@@ -89,6 +89,20 @@ function Sidebar({ selectedMenu, selectedItem }) {
         },
       ],
     },
+    {
+      menuIcon: "https://cdn-icons-png.flaticon.com/128/6463/6463648.png",
+      menu: "Blog Management",
+      subMenu: [
+        {
+          name: "Blogs",
+          path: "/blogs-list",
+        },
+        {
+          name: "Add Blog",
+          path: "/add-blog",
+        },
+      ],
+    },
     
     {
       menuIcon: "https://cdn-icons-png.flaticon.com/128/1601/1601521.png",

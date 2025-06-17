@@ -37,10 +37,16 @@ import AddComboProduct from '../Pages/Product/ComboProduct/AddComboProduct';
 import ComboProductList from '../Pages/Product/ComboProduct/ComboProductList';
 import ComboProductUpdateStep1 from '../Pages/Product/ComboProduct/ComboProductUpdateStep1';
 import ComboProductUpdateStep2 from '../Pages/Product/ComboProduct/ComboProductUpdateStep2';
-import ComboProductUpdateStep3 from '../Pages/Product/ComboProduct/ComboProductUpdateStep3';
+// import ComboProductUpdateStep3 from '../Pages/Product/ComboProduct/ComboProductUpdateStep3';
 import BulkOrderList from '../Pages/Order/BulkOrderList';
 import UserList from '../Pages/User/UserList';
 import VendorList from '../Pages/Vendor/VendorList';
+import BlogList from '../Pages/Blog/BlogList';
+import AddBlog from '../Pages/Blog/AddBlog';
+import UpdateBlog from '../Pages/Blog/UpdateBlog';
+import ProductDetails from '../Pages/Product/ProductDetails';
+import OrderDetails from '../Pages/Order/OrderDetails';
+import OrderInvoice from '../Pages/Order/OrderInvoice';
 
 function AuthenticatedRoutes() {
   return (
@@ -82,6 +88,7 @@ function AuthenticatedRoutes() {
         <Route path="/update-product-step2/:id" element={<ProductUpdateStep2/>}/>
         <Route path="/update-product-step3/:id" element={<ProductUpdateStep3/>}/>
         <Route path="/update-product-attributes/:id" element={<ProductUpdateAttribute/>}/>
+        <Route path="/product-details/:id" element={<ProductDetails/>}/>
         
         {/* support */}
         <Route path="/faq-user-list" element={<UserFaq/>}/>
@@ -105,6 +112,8 @@ function AuthenticatedRoutes() {
         <Route path="/bulk-order-list" element={<BulkOrderList />}/>
         <Route path="/orders" element={<OrderList />} />
         <Route path="/orders/:status" element={<OrderList />} />
+        <Route path="/order-details/:id" element={<OrderDetails />} />
+        <Route path="/order-invoice/:id" element={<OrderInvoice />} />
 
 
         {/* Policy */}
@@ -119,18 +128,18 @@ function AuthenticatedRoutes() {
         <Route path='/combo-product-list' element={<ComboProductList />} />
         <Route path="/update-combo-product-step1/:id" element={<ComboProductUpdateStep1/>}/>
         <Route path="/update-combo-product-step2/:id" element={<ComboProductUpdateStep2/>}/>
-        <Route path="/update-combo-product-step3/:id" element={<ComboProductUpdateStep3/>}/>
+        {/* <Route path="/update-combo-product-step3/:id" element={<ComboProductUpdateStep3/>}/> */}
 
         {/* user routes */}
         <Route path="/user-list" element={<UserList/>}/>
-<<<<<<< HEAD
-        
-        <Route path="/vendor-list" element={<VendorList/>}/>
-=======
 
         {/* vendor routes  */}
         <Route path='/vendor-list' element={<VendorList />} />
->>>>>>> bb4b281d9afe6c0095bb06af8a2c90e6f67cc603
+
+        {/* blog */}
+         <Route path="/blogs-list" element={<BlogList/>}/>
+        <Route path="/add-blog" element={<AddBlog/>}/>
+        <Route path="/update-blog/:id" element={<UpdateBlog/>}/>
     </Routes>
   )
 }

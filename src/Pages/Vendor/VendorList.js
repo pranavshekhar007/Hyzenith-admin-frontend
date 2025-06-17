@@ -2,17 +2,12 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../../Components/Sidebar";
 import TopNav from "../../Components/TopNav";
 import {
-  addCategoryServ,
-  deleteCategoryServ,
-  updateCategoryServ,
-} from "../../services/category.service";
-import {
-  getRoleListServ,
-  getAdminListServ,
-  addAdminServ,
-  deleteAdminServ,
-  updateAdminServ,
-} from "../../services/commandCenter.services";
+  getVenderListServ,
+  updateVendorProfile,
+  deleteVendorServ,
+  createVendorServ,
+} from "../../services/vender.services";
+
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
@@ -30,18 +25,18 @@ function VendorList() {
     sortByField: "",
   });
   const [showSkelton, setShowSkelton] = useState(false);
-  const handleGetAdminFunc = async () => {
+  const handleGetVendorFunc = async () => {
     if (list.length == 0) {
       setShowSkelton(true);
     }
     try {
-      let response = await getAdminListServ(payload);
+      let response = await getVenderListServ(payload);
       setList(response?.data?.data);
       setStatics(response?.data?.documentCount);
     } catch (error) {}
     setShowSkelton(false);
   };
-   const staticsArr = [
+  const staticsArr = [
     {
       title: "Total Vendors",
       count: statics?.totalCount,
@@ -58,20 +53,9 @@ function VendorList() {
       bgColor: "#FFA426",
     },
   ];
-  const [roleList, setRoleList] = useState();
-  const handleGetRoleFunc = async () => {
-    if (list.length == 0) {
-      setShowSkelton(true);
-    }
-    try {
-      let response = await getRoleListServ(payload);
-      setRoleList(response?.data?.data);
-    } catch (error) {}
-    setShowSkelton(false);
-  };
+
   useEffect(() => {
-    handleGetAdminFunc();
-    handleGetRoleFunc();
+    handleGetVendorFunc();
   }, [payload]);
   const [isLoading, setIsLoading] = useState(false);
   const [addFormData, setAddFormData] = useState({
@@ -81,11 +65,14 @@ function VendorList() {
     email: "",
     phone: "",
     password: "",
+    pincode: "",
+    GTIN: "",
+    status: "",
   });
-  const handleAddAdminFunc = async () => {
+  const handleAddVendorFunc = async () => {
     setIsLoading(true);
     try {
-      let response = await addAdminServ(addFormData);
+      let response = await createVendorServ(addFormData);
       if (response?.data?.statusCode == "200") {
         toast.success(response?.data?.message);
         setAddFormData({
@@ -95,8 +82,11 @@ function VendorList() {
           email: "",
           phone: "",
           password: "",
+          pincode: "",
+          GTIN: "",
+          status: "",
         });
-        handleGetAdminFunc();
+        handleGetVendorFunc();
       }
     } catch (error) {
       toast.error(
@@ -107,16 +97,16 @@ function VendorList() {
     }
     setIsLoading(false);
   };
-  const handleDeleteAdminFunc = async (id) => {
+  const handleDeleteVendorFunc = async (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this admin?"
+      "Are you sure you want to delete this vendor?"
     );
     if (confirmed) {
       try {
-        let response = await deleteAdminServ(id);
+        let response = await deleteVendorServ(id);
         if (response?.data?.statusCode == "200") {
           toast?.success(response?.data?.message);
-          handleGetAdminFunc();
+          handleGetVendorFunc();
         }
       } catch (error) {
         toast.error(
@@ -128,28 +118,34 @@ function VendorList() {
     }
   };
   const [editFormData, setEditFormData] = useState({
-    name: "",
-    image: "",
-    status: "",
     _id: "",
-    imgPrev: "",
-    specialApperence: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    pincode: "",
+    GTIN: "",
+    status: "",
   });
-  const handleUpdateAdminFunc = async () => {
+  const handleUpdateVendorFunc = async () => {
     setIsLoading(true);
     try {
-      let response = await updateAdminServ(editFormData);
+      let response = await updateVendorProfile(editFormData);
       if (response?.data?.statusCode == "200") {
         toast.success(response?.data?.message);
         setEditFormData({
-          name: "",
-          image: "",
-          status: "",
           _id: "",
-          imgPrev: "",
-          specialApperence: "",
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          password: "",
+          pincode: "",
+          GTIN: "",
+          status: "",
         });
-        handleGetAdminFunc();
+        handleGetVendorFunc();
       }
     } catch (error) {
       toast.error(
@@ -239,6 +235,7 @@ function VendorList() {
                       <th className="text-center py-3">Name</th>
                       <th className="text-center py-3">Email</th>
                       <th className="text-center py-3">Phone</th>
+                      <th className="text-center py-3">GTIN</th>
                       <th className="text-center py-3">Pincode</th>
                       <th className="text-center py-3">Status</th>
                       <th
@@ -274,6 +271,9 @@ function VendorList() {
                                   <Skeleton width={100} height={25} />
                                 </td>
                                 <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
                                 </td>
                                 <td className="text-center">
@@ -318,10 +318,13 @@ function VendorList() {
                                   {v?.phone}
                                 </td>
                                 <td className="font-weight-600 text-center">
+                                  {v?.GTIN}
+                                </td>
+                                <td className="font-weight-600 text-center">
                                   {v?.pincode}
                                 </td>
                                 <td className="font-weight-600 text-center">
-                                  {v?.status}
+                                  {v?.status ? "Active" : "Inactive"}
                                 </td>
                                 <td className="text-center">
                                   <a
@@ -332,7 +335,8 @@ function VendorList() {
                                         email: v?.email,
                                         phone: v?.phone,
                                         password: v?.password,
-                                        role: v?.role,
+                                        pincode: v?.pincode,
+                                        status: v?.status,
                                         _id: v?._id,
                                       });
                                     }}
@@ -342,7 +346,7 @@ function VendorList() {
                                   </a>
                                   <a
                                     onClick={() =>
-                                      handleDeleteAdminFunc(v?._id)
+                                      handleDeleteVendorFunc(v?._id)
                                     }
                                     className="btn btn-warning mx-2 text-light shadow-sm"
                                   >
@@ -388,7 +392,8 @@ function VendorList() {
                       email: "",
                       phone: "",
                       password: "",
-                      role: "",
+                      pincode: "",
+                      status: "",
                     })
                   }
                 />
@@ -466,6 +471,18 @@ function VendorList() {
                         })
                       }
                     />
+                    <label className="mt-3">GITN Code</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      onChange={(e) =>
+                        setAddFormData({
+                          ...addFormData,
+                          GTIN: e.target.value,
+                        })
+                      }
+                    />
+
                     <label className="mt-3">Password</label>
                     <input
                       className="form-control"
@@ -478,7 +495,15 @@ function VendorList() {
                       }
                     />
                     <label className="mt-3">Status</label>
-                    <select className="form-control">
+                    <select
+                      className="form-control"
+                      onChange={(e) =>
+                        setAddFormData({
+                          ...addFormData,
+                          status: e.target.value,
+                        })
+                      }
+                    >
                       <option value="">Select</option>
                       <option value={true}>Active</option>
                       <option value={false}>Inactive</option>
@@ -492,8 +517,10 @@ function VendorList() {
                         addFormData?.phone &&
                         addFormData?.password &&
                         addFormData?.pincode &&
+                        addFormData?.GTIN &&
+                        addFormData?.status &&
                         !isLoading
-                          ? handleAddAdminFunc
+                          ? handleAddVendorFunc
                           : undefined
                       }
                       disabled={
@@ -503,6 +530,8 @@ function VendorList() {
                         !addFormData?.phone &&
                         !addFormData?.password &&
                         !addFormData?.pincode &&
+                        !addFormData?.GTIN &&
+                        !addFormData?.status &&
                         isLoading
                       }
                       style={{
@@ -513,7 +542,8 @@ function VendorList() {
                           !addFormData?.phone ||
                           !addFormData?.password ||
                           !addFormData?.pincode ||
-                          isLoading
+                          !addFormData?.GTIN ||
+                          (!addFormData?.status && isLoading)
                             ? "0.5"
                             : "1",
                       }}
@@ -549,13 +579,14 @@ function VendorList() {
                   style={{ height: "20px" }}
                   onClick={() =>
                     setEditFormData({
-                      _id: "",
                       firstName: "",
                       lastName: "",
                       email: "",
                       phone: "",
                       password: "",
-                      role: "",
+                      pincode: "",
+                      status: "",
+                      _id: "",
                     })
                   }
                 />
@@ -638,6 +669,18 @@ function VendorList() {
                         })
                       }
                     />
+                    <label className="mt-3">GTIN Code</label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      value={editFormData?.GTIN}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          GTIN: e.target.value,
+                        })
+                      }
+                    />
                     <label className="mt-3">Password</label>
                     <input
                       className="form-control"
@@ -651,7 +694,16 @@ function VendorList() {
                       }
                     />
                     <label className="mt-3">Status</label>
-                    <select className="form-control">
+                    <select
+                      className="form-control"
+                      value={editFormData?.status}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          status: e.target.value,
+                        })
+                      }
+                    >
                       <option value="">Select</option>
                       <option value={true}>Active</option>
                       <option value={false}>Inactive</option>
@@ -665,9 +717,10 @@ function VendorList() {
                         editFormData?.email &&
                         editFormData?.phone &&
                         editFormData?.password &&
+                        editFormData?.GTIN &&
                         editFormData?.role &&
                         !isLoading
-                          ? handleUpdateAdminFunc
+                          ? handleUpdateVendorFunc
                           : undefined
                       }
                       disabled={
@@ -676,6 +729,7 @@ function VendorList() {
                         !editFormData?.email &&
                         !editFormData?.phone &&
                         !editFormData?.password &&
+                        !editFormData?.GTIN &&
                         !editFormData?.role &&
                         isLoading
                       }
@@ -686,6 +740,7 @@ function VendorList() {
                           !editFormData?.email ||
                           !editFormData?.phone ||
                           !editFormData?.password ||
+                          !editFormData?.GTIN ||
                           !editFormData?.role ||
                           isLoading
                             ? "0.5"

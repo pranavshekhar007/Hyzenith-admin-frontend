@@ -246,7 +246,7 @@ function ProductUpdateStep2() {
                   </select>
                 </div>
       
-                <div className="col-4 mb-3">
+                <div className="col-6 mb-3">
                   <label>Product Price (MRP)</label>
                   <input
                     onChange={(e) =>
@@ -259,7 +259,7 @@ function ProductUpdateStep2() {
                     className="form-control"
                   />
                 </div>
-                <div className="col-4 mb-3">
+                <div className="col-6 mb-3">
                   <label>Discounted/Sale Price</label>
                   <input
                     onChange={(e) =>
@@ -272,55 +272,6 @@ function ProductUpdateStep2() {
                     className="form-control"
                   />
                 </div>
-                <div className="col-4 mb-3">
-                  <label>Offer Price</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({ ...formData, offerPrice: e.target.value })
-                    }
-                    value={formData?.offerPrice}
-                    className="form-control"
-                  />
-                </div>
-
-                <div className="col-6 mb-3">
-                  <label>Number of Pieces</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        numberOfPieces: e.target.value,
-                      })
-                    }
-                    value={formData?.numberOfPieces}
-                    className="form-control"
-                  />
-                </div>
-                {/* 
-                <div className="col-6 mb-3">
-                  <label>Currency</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({ ...formData, currency: e.target.value })
-                    }
-                    value={formData?.currency}
-                    className="form-control"
-                  />
-                </div> */}
-
-                {/* <div className="col-6 mb-3">
-                  <label>Sale Price</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({ ...formData, salePrice: e.target.value })
-                    }
-                    value={formData?.salePrice}
-                    className="form-control"
-                  />
-                </div> */}
-
-               
-
                 <div className="col-12 mb-3">
                   <label>Product Description</label>
                   <JoditEditor

@@ -39,9 +39,9 @@ function TopNav() {
           className="barIcon"
         />
         <div className="d-flex align-items-center navRightDiv">
-          <div className="me-3 notificationDiv d-flex">
+          <div className="me-3 notificationDiv d-flex" onClick={()=>alert("Coming Soon")}>
             <img src="https://cdn-icons-png.flaticon.com/128/3602/3602123.png" />
-            <p>2</p>
+            <p>0</p>
           </div>
           <div
             className="d-flex align-items-center me-0 me-md-4"

@@ -239,6 +239,15 @@ function BulkOrderList() {
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
                                 </td>
+                                <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
+                                <td className="text-center">
+                                  <Skeleton width={100} height={25} />
+                                </td>
                                 
                                 <td className="text-center">
                                   <Skeleton width={100} height={25} />
@@ -268,7 +277,7 @@ function BulkOrderList() {
                                 <td className="font-weight-600 text-center">
                                   {v?.contactNumber}
                                 </td>
-                                <td className="font-weight-600 text-center">
+                                <td className="font-weight-600 text-center" style={{width:"200px"}}>
                                   {v?.message}
                                 </td>
                                 <td className="text-center">

@@ -12,39 +12,32 @@ import { useNavigate } from "react-router-dom";
 import { getProductServ } from "../../../services/product.services";
 import { addComboProductServ } from "../../../services/comboProduct.services";
 import { getProductTypeServ } from "../../../services/productType.service";
+
+
 function AddComboProduct() {
   const { globalState, setGlobalState } = useGlobalState();
   const navigate = useNavigate();
   const editor = useRef(null);
   const contentRef = useRef("");
-  const config = {
-    placeholder: "Start typing...",
-    height: "300px",
-  };
-  const [hsnError, setHsnError] = useState("");
+  const config = { placeholder: "Start typing...", height: "300px" };
 
   const [content, setContent] = useState("");
+  const [loader, setLoader] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
-    productId: [],
-    productType: "",
+    productList: [],
     gtin: "",
-    shortDescription: "",
+    stockQuantity: "",
+    price: "",
+    discountedPrice: "",
+    comboPrice: "",
+    description: "",
+    status: true,
   });
 
-  const [productType, setProductType] = useState([]);
-  const getProductTypeListFunc = async () => {
-    try {
-      let response = await getProductTypeServ({ status: true });
-      if (response?.data?.statusCode == "200") {
-        setProductType(response?.data?.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const [productList, setProductList] = useState([]);
+
   const getProductListFunc = async () => {
     try {
       let response = await getProductServ();
@@ -57,48 +50,34 @@ function AddComboProduct() {
   };
 
   useEffect(() => {
-    getProductTypeListFunc();
     getProductListFunc();
   }, []);
-  const [loader, setLoader] = useState(false);
+
+  const handleProductSelect = (selectedOptions) => {
+    const newProductList = selectedOptions.map((option) => {
+      const existing = formData.productList.find((p) => p.productId === option.value);
+      return existing || { productId: option.value, quantity: 1 };
+    });
+    setFormData({ ...formData, productList: newProductList });
+  };
+
+  const handleQuantityChange = (productId, quantity) => {
+    const updatedList = formData.productList.map((item) =>
+      item.productId === productId ? { ...item, quantity } : item
+    );
+    setFormData({ ...formData, productList: updatedList });
+  };
+
   const handleSubmit = async () => {
     setLoader(true);
     try {
-      let finalPayload;
-      const shortDescription = contentRef.current;
-      if (formData?.createdByAdmin != "No") {
-        finalPayload = {
-          name: formData?.name,
-          productId: formData?.productId,
-          productType: formData?.productType,
-          gtin: formData?.gtin,
-          shortDescription: shortDescription,
-          createdBy: formData?.createdBy,
-        };
-      }
-      if (formData?.createdByAdmin == "No") {
-        finalPayload = {
-          name: formData?.name,
-          productId: formData?.productId,
-          productType: formData?.productType,
-          gtin: formData?.gtin,
-          shortDescription: shortDescription,
-          createdBy: formData?.createdBy,
-        };
-      }
-      let response = await addComboProductServ(finalPayload);
+      const payload = {
+        ...formData,
+        description: contentRef.current,
+      };
+      let response = await addComboProductServ(payload);
       if (response?.data?.statusCode == 200) {
         toast.success(response?.data?.message);
-        setFormData({
-          name: "",
-          productId: [],
-          productType: "",
-          gtin: "",
-          createdBy: "",
-          createdByAdmin: "",
-        });
-        contentRef.current = "";
-        setContent("");
         navigate("/update-combo-product-step2/" + response?.data?.data?._id);
       } else {
         toast.error("Something went wrong");
@@ -108,165 +87,171 @@ function AddComboProduct() {
     }
     setLoader(false);
   };
+  useEffect(() => {
+  const calculatePrices = () => {
+    let totalPrice = 0;
+    let totalDiscountedPrice = 0;
+
+    formData.productList.forEach((item) => {
+      const product = productList.find((p) => p._id === item.productId);
+      if (product) {
+        totalPrice += (product.price || 0) * item.quantity;
+        totalDiscountedPrice += (product.discountedPrice || 0) * item.quantity;
+      }
+    });
+
+    setFormData((prev) => ({
+      ...prev,
+      price: totalPrice.toFixed(2),
+      discountedPrice: totalDiscountedPrice.toFixed(2),
+    }));
+  };
+
+  calculatePrices();
+}, [formData.productList, productList]);
+
 
   return (
     <div className="bodyContainer">
-      <Sidebar
-        selectedMenu="Product Management"
-        selectedItem="Add Combo Product"
-      />
+      <Sidebar selectedMenu="Product Management" selectedItem="Add Combo Product" />
       <div className="mainContainer">
         <TopNav />
-        <div className="p-lg-4 p-md-3 p-2">
-          <div
-            className="row mx-0 p-0"
-            style={{
-              position: "relative",
-              top: "-75px",
-              marginBottom: "-75px",
-            }}
-          ></div>
+        <div className="p-lg-4 p-md-3 p-2 ">
+          <h4 className="p-2 text-dark shadow rounded mb-4" style={{ background: "#05E2B5" }}>
+            Add Combo Product : Step 1/2
+          </h4>
 
-          <div className="mt-3">
-            <div className="card-body px-2">
-              <div className="table-responsive table-invoice">
-                <div className="d-flex">
-                  <h4
-                    className="p-2 text-dark shadow rounded mb-4 "
-                    style={{ background: "#05E2B5" }}
-                  >
-                    Add Combo Product : Step 1/3
-                  </h4>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-6 mb-3">
-                  <label>Product Name*</label>
+          <div className="row">
+            {/* Combo Name */}
+            <div className="col-4 mb-3">
+              <label>Combo Name*</label>
+              <input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="form-control"
+                style={{ height: "45px" }}
+              />
+            </div>
+
+            {/* GTIN */}
+            <div className="col-4 mb-3">
+              <label>GTIN Code*</label>
+              <input
+                className="form-control"
+                style={{ height: "45px" }}
+                value={formData.gtin}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (/^\d*$/.test(value)) setFormData({ ...formData, gtin: value });
+                }}
+              />
+            </div>
+
+            {/* Stock Quantity */}
+            <div className="col-4 mb-3">
+              <label>Stock Quantity*</label>
+              <input
+                className="form-control"
+                style={{ height: "45px" }}
+                value={formData.stockQuantity}
+                onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
+              />
+            </div>
+
+            
+            <div className="col-6 border p-2  mb-3">
+              <label>Products*</label>
+              <Select
+                isMulti
+                options={productList.map((v) => ({ label: v.name, value: v._id }))}
+                value={formData.productList.map((v) => {
+                  const product = productList.find((p) => p._id === v.productId);
+                  return { label: product?.name, value: v.productId };
+                })}
+                onChange={handleProductSelect}
+              />
+              {formData.productList.map((item, i) => {
+              const product = productList.find((p) => p._id === item.productId);
+              return (
+                <div className=" mb-3" key={i}>
+                  <label>{product?.name} Quantity*</label>
                   <input
-                    value={formData?.name}
+                    type="number"
+                    className="form-control"
+                    value={item.quantity}
                     onChange={(e) =>
-                      setFormData({ ...formData, name: e?.target?.value })
+                      handleQuantityChange(item.productId, Number(e.target.value))
                     }
-                    className="form-control"
-                    style={{ height: "45px" }}
                   />
                 </div>
+              );
+            })}
+            </div>
 
-                <div className="col-6 mb-3">
-                  <label>Select Product Type*</label>
-                  <select
-                    className="form-control"
-                    value={formData?.productType}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        productType: e?.target?.value,
-                      })
-                    }
-                  >
-                    <option>Select</option>
-                    {productType?.map((v, i) => {
-                      return <option>{v?.name}</option>;
-                    })}
-                  </select>
-                </div>
+            {/* Product Quantities */}
+            
 
-                <div className="col-6 mb-3">
-                  <label>Product*</label>
-                  <Select
-                    isMulti
-                    options={productList?.map((v) => ({
-                      label: v?.name,
-                      value: v?._id,
-                    }))}
-                    value={productList
-                      .filter((v) => formData.productId.includes(String(v._id)))
-                      .map((v) => ({ label: v.name, value: v._id }))}
-                    onChange={(selectedOptions) =>
-                      setFormData({
-                        ...formData,
-                        productId: selectedOptions.map(
-                          (option) => option.value
-                        ),
-                      })
-                    }
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                  />
-                </div>
+            {/* Price */}
+            <div className="col-6 border p-2 rounded mb-3">
+              <label>Price*</label>
+              <input
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="form-control"
+                style={{ height: "45px" }}
+              />
+              {/* Discounted Price */}
+            <div className=" mb-3">
+              <label>Discounted Price*</label>
+              <input
+                value={formData.discountedPrice}
+                onChange={(e) => setFormData({ ...formData, discountedPrice: e.target.value })}
+                className="form-control"
+                style={{ height: "45px" }}
+              />
+            </div>
 
-                <div className="col-6 mb-3">
-                  <label>GTIN Code*</label>
-                  <input
-                    className="form-control"
-                    style={{ height: "45px" }}
-                    value={formData?.gtin || ""}
-                    required
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (/^\d*$/.test(value)) {
-                        setFormData({ ...formData, gtin: value });
-                      }
-                    }}
-                  />
-                </div>
+            {/* Combo Price */}
+            <div className=" mb-3">
+              <label>Combo Price*</label>
+              <input
+                value={formData.comboPrice}
+                onChange={(e) => setFormData({ ...formData, comboPrice: e.target.value })}
+                className="form-control"
+                style={{ height: "45px" }}
+              />
+            </div>
+            </div>
 
-                <div className="col-12 mb-3">
-                  <label>Short Description*</label>
-                  <JoditEditor
-                    ref={editor}
-                    config={config}
-                    value={content}
-                    onChange={(newContent) => {
-                      contentRef.current = newContent;
-                    }}
-                  />
-                </div>
-                {loader ? (
-                  <div className="col-12">
-                    <button
-                      className="btn btn-primary w-100"
-                      style={{
-                        background: "#05E2B5",
-                        border: "none",
-                        borderRadius: "24px",
-                        opacity: "0.6",
-                      }}
-                    >
-                      Saving ...
-                    </button>
-                  </div>
-                ) : formData?.name &&
-                  formData?.productType?.length > 0 &&
-                  formData?.gtin ? (
-                  <div className="col-12">
-                    <button
-                      className="btn btn-primary w-100"
-                      style={{
-                        background: "#05E2B5",
-                        border: "none",
-                        borderRadius: "24px",
-                      }}
-                      onClick={handleSubmit}
-                    >
-                      Submit
-                    </button>
-                  </div>
-                ) : (
-                  <div className="col-12">
-                    <button
-                      className="btn btn-primary w-100"
-                      style={{
-                        background: "#61ce70",
-                        border: "none",
-                        borderRadius: "24px",
-                      }}
-                    >
-                      Submit
-                    </button>
-                  </div>
-                )}
-              </div>
+            
+
+            {/* Description */}
+            <div className="col-12 mb-3">
+              <label>Description*</label>
+              <JoditEditor
+                ref={editor}
+                config={config}
+                value={content}
+                onChange={(newContent) => {
+                  contentRef.current = newContent;
+                }}
+              />
+            </div>
+
+            {/* Submit */}
+            <div className="col-12">
+              <button
+                className="btn btn-primary w-100"
+                style={{
+                  background: loader ? "#05E2B5" : "#61ce70",
+                  border: "none",
+                  borderRadius: "24px",
+                  opacity: loader ? 0.6 : 1,
+                }}
+                onClick={!loader && handleSubmit}
+              >
+                {loader ? "Saving..." : "Submit"}
+              </button>
             </div>
           </div>
         </div>
@@ -276,3 +261,4 @@ function AddComboProduct() {
 }
 
 export default AddComboProduct;
+

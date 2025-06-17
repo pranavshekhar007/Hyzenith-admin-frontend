@@ -4,119 +4,110 @@ import TopNav from "../../../Components/TopNav";
 import "react-loading-skeleton/dist/skeleton.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import JoditEditor from "jodit-react";
-
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  getComboProductDetailsServ,
-  updateComboProductServ,
-} from "../../../services/comboProduct.services";
+import { deleteComboProductGalleryServ, getComboProductDetailsServ, updateComboProductGalleryServ, updateComboProductHeroImage, updateComboProductServ, updateComboProductVideoServ } from "../../../services/comboProduct.services";
 function ComboProductUpdateStep2() {
-  const params = useParams();
   const navigate = useNavigate();
-  const editor = useRef(null);
-  const [content, setContent] = useState("");
-  const [_id, setId] = useState("");
-  const [btnLoader, setBtnLoader] = useState(false);
-  const contentRef = useRef(""); // ✅ Store content without causing re-renders
-  const [showPackServingWarning, setShowPackServingWarning] = useState(false);
-  const [proceedAnyway, setProceedAnyway] = useState(false); // for "Yes/No" control
-
-  // Jodit Editor Config
-  const config = {
-    placeholder: "Start typing...",
-    height: "400px",
-  };
-  const [formData, setFormData] = useState({
-    stockQuantity: "",
-
-    pricing: {
-      actualPrice: "",
-      offerPrice: "",
-      currency: "INR",
-    },
-
-    weight: {
-      itemWeight: "",
-      packageWeight: "",
-    },
-
-    longDescription: "",
-  });
-
-  const getProductDetails = async () => {
+  const params = useParams();
+  const uploadHeroImage = async (img) => {
     try {
-      let response = await getComboProductDetailsServ(params?.id);
-      if (response?.data?.statusCode === 200) {
-        const product = response?.data?.data;
-        setFormData({
-          stockQuantity: product?.stockQuantity || "",
-          pricing: {
-            actualPrice: product?.pricing?.actualPrice || "",
-            offerPrice: product?.pricing?.offerPrice || "",
-            currency: product?.pricing?.currency || "INR",
-          },
-
-          weight: {
-            itemWeight: product?.weight?.itemWeight || "",
-            packageWeight: product?.weight?.packageWeight || "",
-          },
-
-          longDescription: product?.longDescription || "",
-        });
-        setContent(product?.longDescription || "");
-        contentRef.current = product?.longDescription || "";
-      }
-    } catch (error) {
-      toast.error("Failed to fetch product details.");
-    }
-  };
-
-  useEffect(() => {
-    // getBrandList();
-    getProductDetails();
-  }, []);
-
-  const updateProductFunc = async () => {
-    setBtnLoader(true);
-    try {
-      let updatedData = {
-        ...formData,
-        longDescription: contentRef.current,
-        id: params?.id,
-      };
-      let response = await updateComboProductServ(updatedData);
+      const formData = new FormData();
+      formData.append("productHeroImage", img);
+      formData.append("id", params.id);
+      let response = await updateComboProductHeroImage(formData);
       if (response?.data?.statusCode == "200") {
-        toast.success("Combo Product Step 2 Updated Successfully!");
-        setFormData({
-          stockQuantity: "",
-
-          pricing: {
-            actualPrice: "",
-            offerPrice: "",
-            currency: "INR",
-          },
-
-          weight: {
-            itemWeight: "",
-            packageWeight: "",
-          },
-
-          longDescription: "",
-        });
-        navigate("/update-combo-product-step3/" + response?.data?.data?._id);
+        toast.success(response?.data?.message);
+        getProductDetails()
       } else {
         toast.error("Something went wrong");
       }
     } catch (error) {
       toast.error("Internal Server Error");
     }
-    setBtnLoader(false);
   };
+//   const uploadProductVideo = async (video) => {
+//     try {
+//       const formData = new FormData();
+//       formData.append("productVideo", video);
+//       formData.append("id", params.id);
+//       let response = await updateComboProductVideoServ(formData);
+//       if (response?.data?.statusCode == "200") {
+//         toast.success(response?.data?.message);
+//         getProductDetails()
+//       } else {
+//         toast.error("Something went wrong");
+//       }
+//     } catch (error) {
+//       toast.error("Internal Server Error");
+//     }
+//   };
+
+  const uploadProductGalleryFunc = async (img) => {
+    try {
+      const formData = new FormData();
+      formData.append("productGallery", img);
+      formData.append("id", params.id);
+      let response = await updateComboProductGalleryServ(formData);
+      if (response?.data?.statusCode == "200") {
+        toast.success(response?.data?.message);
+        getProductDetails()
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (error) {
+      toast.error("Internal Server Error");
+    }
+  };
+  const [details, setDetails] = useState({
+    productHeroImage: "",
+    productGallery: [],
+    // productVideo: "",
+  });
+  const getProductDetails = async () => {
+    try {
+      let response = await getComboProductDetailsServ(params?.id);
+      if (response?.data?.statusCode == "200") {
+        setDetails({
+          productHeroImage: response?.data?.data?.productHeroImage,
+          productGallery: response?.data?.data?.productGallery,
+        //   productVideo: response?.data?.data?.productVideo,
+        });
+      }
+    } catch (error) {}
+  };
+  useEffect(() => {
+    getProductDetails();
+  }, []);
+  const deleteProductGalleryFunc =async (index)=>{
+    try {
+      let response = await deleteComboProductGalleryServ({id:params?.id, index:index});
+      if(response?.data?.statusCode=="200"){
+        toast.success(response?.data?.message)
+        getProductDetails()
+      }
+    } catch (error) {
+      toast.error("Internal Server Error")
+    }
+  }
+
+   const handleSubmit = async () => {
+      const finalPayload = {
+        id: params?.id,
+      };
+  
+      try {
+        let response = await updateComboProductServ(finalPayload);
+        if (response?.data?.statusCode === 200) {
+          toast.success(response?.data?.message);
+          navigate("/combo-product-list");
+        }
+      } catch (error) {
+        toast.error("Something went wrong");
+      }
+    };
   return (
     <div className="bodyContainer">
-      <Sidebar selectedMenu="Product Management" selectedItem="Add Product" />
+      <Sidebar selectedMenu="Product Management" selectedItem="" />
       <div className="mainContainer">
         <TopNav />
         <div className="p-lg-4 p-md-3 p-2">
@@ -137,151 +128,112 @@ function ComboProductUpdateStep2() {
                     className="p-2 text-dark shadow rounded mb-4 "
                     style={{ background: "#05E2B5" }}
                   >
-                    Update Combo Product : Step 2/3
+                    Update Product : Step 2/2
                   </h4>
                 </div>
               </div>
               <div className="row">
                 <div className="col-4 mb-3">
-                  <label>Stock Quantity</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        stockQuantity: e?.target.value,
-                      })
-                    }
-                    value={formData?.stockQuantity}
-                    className="form-control"
-                  />
+                  <div className="border p-2">
+                    <div className="d-flex justify-content-center">
+                      <img
+                        src={
+                          details?.productHeroImage
+                            ? details?.productHeroImage
+                            : "https://cdn-icons-png.flaticon.com/128/159/159626.png"
+                        }
+                        className="img-fluid mb-2"
+                        style={{ height: "150px" }}
+                      />
+                    </div>
+                    <input
+                      className="form-control"
+                      type="file"
+                      onChange={(e) => uploadHeroImage(e?.target?.files[0])}
+                    />
+                    <label>Product Hero Image</label>
+                  </div>
                 </div>
-
-                <div className="col-4 mb-3">
-                  <label>Item Weight</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        weight: {
-                          ...formData.weight,
-                          itemWeight: e.target.value,
-                        },
-                      })
-                    }
-                    value={formData?.weight?.itemWeight || ""}
-                    className="form-control"
-                  />
-                </div>
-                <div className="col-4 mb-3">
-                  <label>Package Weight</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        weight: {
-                          ...formData.weight,
-                          packageWeight: e.target.value,
-                        },
-                      })
-                    }
-                    value={formData?.weight?.packageWeight || ""}
-                    className="form-control"
-                  />
-                </div>
-                <hr />
-                <div className="col-12 d-flex ">
-                  <p className="py-1 px-3 me-2 bg-primary text-light rounded bedge">
-                    INR
-                  </p>
-                  <p
-                    className="py-1 px-3 me-2 bg-secondary text-light rounded bedge"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => alert("Comming Soon")}
-                  >
-                    USD
-                  </p>
-                  <p
-                    className="py-1 px-3 me-2 bg-secondary text-light rounded bedge"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => alert("Comming Soon")}
-                  >
-                    AED
-                  </p>
-                </div>
-
-                <div className="col-6 mb-3">
-                  <label>Product Price (MRP)</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pricing: {
-                          ...formData.pricing,
-                          actualPrice: e.target.value,
-                        },
-                      })
-                    }
-                    value={formData?.pricing?.actualPrice || ""}
-                    className="form-control"
-                  />
-                </div>
-                <div className="col-6 mb-3">
-                  <label>Discounted/Sale Price</label>
-                  <input
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pricing: {
-                          ...formData.pricing,
-                          offerPrice: e.target.value,
-                        },
-                      })
-                    }
-                    value={formData?.pricing?.offerPrice || ""}
-                    className="form-control"
-                  />
-                </div>
+                {/* <div className="col-4 mb-3">
+                  <div className="border p-2">
+                    <div className="d-flex justify-content-center">
+                      {details?.productVideo ? (
+                        <video
+                          className="mb-2"
+                          style={{ height: "150px" }}
+                          src={details?.productVideo}
+                        ></video>
+                      ) : (
+                        <img
+                          src="https://cdn-icons-png.flaticon.com/128/16792/16792767.png"
+                          className="img-fluid mb-2"
+                        />
+                      )}
+                    </div>
+                    <input
+                      className="form-control"
+                      type="file"
+                      onChange={(e) => uploadProductVideo(e?.target?.files[0])}
+                    />
+                    <label>Product Video</label>
+                  </div>
+                </div> */}
                 <div className="col-12 mb-3">
-                  <label>Product Description</label>
-                  <JoditEditor
-                    ref={editor}
-                    config={config}
-                    value={content}
-                    onChange={(newContent) => {
-                      contentRef.current = newContent; // ✅ Update ref without re-rendering
-                    }}
-                  />
+                  <label>Product Gallery</label>
+                  <div className="p-2 border d-flex">
+                    <div>
+                      <div className="d-flex justify-content-center">
+                        <img
+                          src="https://cdn-icons-png.flaticon.com/128/16792/16792767.png"
+                          className="img-fluid mb-2"
+                        />
+                      </div>
+                      <input
+                        className="form-control"
+                        type="file"
+                        onChange={(e) =>
+                          uploadProductGalleryFunc(e?.target?.files[0])
+                        }
+                      />
+                    </div>
+                    {details?.productGallery?.map((v, i) => {
+                      return (
+                        <div className="p-2 border mx-2">
+                          <div className="d-flex justify-content-end">
+                            <img
+                              style={{
+                                height: "20px",
+                                position: "relative",
+                                marginBottom: "-20px",
+                              }}
+                              onClick={()=>deleteProductGalleryFunc(i)}
+                              src="https://cdn-icons-png.flaticon.com/128/9068/9068699.png"
+                            />
+                          </div>
+                          <img
+                            className="img-fluid"
+                            style={{ height: "150px" }}
+                            src={v}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                {btnLoader ? (
-                  <div className="col-12">
-                    <button
-                      className="btn btn-primary w-100"
-                      style={{
-                        background: "#05E2B5",
-                        border: "none",
-                        borderRadius: "24px",
-                        opacity: "0.6",
-                      }}
-                    >
-                      Updating ...
-                    </button>
-                  </div>
-                ) : (
-                  <div className="col-12">
-                    <button
-                      className="btn btn-primary w-100"
-                      style={{
-                        background: "#61ce70",
-                        border: "none",
-                        borderRadius: "24px",
-                      }}
-                      onClick={() => updateProductFunc()}
-                      disabled={showPackServingWarning && !proceedAnyway} // Disable until confirmed
-                    >
-                      Update
-                    </button>
-                  </div>
-                )}
+
+                <div className="col-12">
+                  <button
+                    className="btn btn-primary w-100"
+                    style={{
+                      background: "#61ce70",
+                      border: "none",
+                      borderRadius: "24px",
+                    }}
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
             </div>
           </div>
