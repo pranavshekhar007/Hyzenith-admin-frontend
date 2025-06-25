@@ -37,6 +37,7 @@ function ProductUpdateStep1() {
     shortDescription: "",
     venderId: [],
     productApperence: "",
+    barCode:""
   });
 
   const [tagOptions, setTagOptions] = useState([]);
@@ -96,18 +97,19 @@ function ProductUpdateStep1() {
     try {
       let response = await getProductDetailsServ(params?.id);
       if (response?.data?.statusCode === 200) {
-        const product = response?.data?.data;
+        const product = response?.data?.data?.product;
         setFormData({
           name: product?.name || "",
           tags: product?.tags || [],
           productType: product?.productType || "",
           tax: product?.tax || "",
-          categoryId: product?.categoryId || [],
+          categoryId: product?.categoryId?.map((v) => v._id) || [],
           venderId: product?.venderId || [],
           hsnCode: product?.hsnCode || "",
           GTIN: product?.GTIN || "",
           shortDescription: product?.shortDescription || "",
           productApperence: product?.productApperence,
+          barCode: product?.barCode,
         });
         setContent(product?.shortDescription || "");
         contentRef.current = product?.shortDescription || "";
@@ -143,6 +145,7 @@ function ProductUpdateStep1() {
           GTIN: "",
           shortDescription: "",
           productApperence: "",
+          barCode:""
         });
         navigate("/update-product-step2/" + response?.data?.data?._id);
       } else {
@@ -319,6 +322,20 @@ function ProductUpdateStep1() {
                   )}
                 </div>
                 <div className="col-6 mb-3">
+                  <label>Bar Code*</label>
+                  <input
+                    className={`form-control`}
+                    style={{ height: "45px" }}
+                    type="number"
+                    value={formData?.barCode}
+                    onChange={(e) => {
+                       setFormData({ ...formData, barCode: e?.target?.value })
+                      
+                    }}
+                  />
+                  
+                </div>
+                <div className="col-12 mb-3">
                   <label>Special Apperence</label>
                   <select
                   value={formData?.productApperence}

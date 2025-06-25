@@ -135,7 +135,7 @@ function AddComboProduct() {
 
             {/* GTIN */}
             <div className="col-4 mb-3">
-              <label>GTIN Code*</label>
+              <label>Bar Code*</label>
               <input
                 className="form-control"
                 style={{ height: "45px" }}

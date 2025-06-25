@@ -69,12 +69,12 @@ const OrderInvoice = () => {
               <div className="d-flex justify-content-between mb-4">
                 <div>
                   <img
-                    src="https://bigbangcrackers.com/wp-content/uploads/2023/08/cropped-big-bang-logo-png.png"
-                    alt="Big Bang Crackers"
+                    src="/hyzenith.jpeg"
+                    alt="Hyzenith"
                     width="100"
                   />
-                  <p className="fw-bold text-danger mt-2 mb-0">Big Bang Crackers</p>
-                  <p className="mb-0">Email: bigbangcrackers7@gmail.com</p>
+                  <p className="fw-bold text-danger mt-2 mb-0">Hyzenith</p>
+                  <p className="mb-0">Email: hyzenith@gmail.com</p>
                   <p className="mb-0">Customer Care: 9894047372</p>
                 </div>
                 <div className="text-end">

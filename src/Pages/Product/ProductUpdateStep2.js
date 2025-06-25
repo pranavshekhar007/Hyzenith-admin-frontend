@@ -82,7 +82,7 @@ function ProductUpdateStep2() {
     try {
       let response = await getProductDetailsServ(params?.id);
       if (response?.data?.statusCode === 200) {
-        const product = response?.data?.data;
+        const product = response?.data?.data?.product;
         setFormData({
           stockQuantity: product?.stockQuantity || "",
           brandId: product?.brandId || "",

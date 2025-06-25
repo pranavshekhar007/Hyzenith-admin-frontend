@@ -37,7 +37,8 @@ function AddProduct() {
     hsnCode: "",
     GTIN: "",
     shortDescription: "",
-    productApperence:""
+    productApperence:"",
+    barCode:"",
   });
   const [tags, setTags] = useState([]);
   const getTagListFunc = async () => {
@@ -121,7 +122,8 @@ function AddProduct() {
           hsnCode: formData?.hsnCode,
           GTIN: formData?.GTIN,
           shortDescription: shortDescription,
-          productApperence:formData?.productApperence
+          productApperence:formData?.productApperence,
+          barCode:formData?.barCode,
         };
       }
       if (formData?.createdByAdmin == "No") {
@@ -134,10 +136,11 @@ function AddProduct() {
           venderId: formData?.venderId,
           madeIn: formData?.madeIn,
           hsnCode: formData?.hsnCode,
-          GTIN: formData?.GTIN,
+          
           shortDescription: shortDescription,
           createdBy: formData?.createdBy,
-          productApperence: formData?.productApperence
+          productApperence: formData?.productApperence,
+          barCode: formData?.barCode
         };
       }
       let response = await addProductServ(finalPayload);
@@ -152,10 +155,11 @@ function AddProduct() {
           venderId: "",
           madeIn: "",
           hsnCode: "",
-          GTIN: "",
+          
           createdBy: "",
           createdByAdmin: "",
-          productApperence:""
+          productApperence:"",
+          barCode:""
         });
         contentRef.current = "";
         setContent("");
@@ -332,8 +336,22 @@ const [vendorList, setVendorList]=useState([]);
                     <div className="invalid-feedback">{hsnError}</div>
                   )}
                 </div>
-
                 <div className="col-6 mb-3">
+                  <label>Bar Code*</label>
+                  <input
+                    className={`form-control `}
+                    style={{ height: "45px" }}
+                    type="number"
+                    value={formData?.barCode}
+                    onChange={(e) => {
+                       setFormData({ ...formData, barCode: e?.target?.value })
+                      
+                    }}
+                  />
+                  
+                </div>
+
+                <div className="col-12 mb-3">
                   <label>Special Apperence</label>
                   <select onChange={(e)=>setFormData({...formData, productApperence:e?.target?.value})} className="form-control">
                     <option>Select</option>

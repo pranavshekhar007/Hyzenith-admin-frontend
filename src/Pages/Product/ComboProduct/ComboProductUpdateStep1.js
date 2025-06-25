@@ -24,7 +24,7 @@ function ComboProductUpdateStep1() {
     name: "",
     productType: "",
     productId: [],
-    gtin: "",
+    barCode: "",
     shortDescription: "",
   });
 
@@ -75,7 +75,7 @@ function ComboProductUpdateStep1() {
           name: product?.name || "",
           productType: product?.productType || "",
           productId: product?.productId || [],
-          gtin: product?.gtin || "",
+          barCode: product?.barCode || "",
           shortDescription: product?.shortDescription || "",
         });
         setContent(product?.shortDescription || "");
@@ -106,7 +106,7 @@ function ComboProductUpdateStep1() {
           name: "",
           productId: [],
           productType: "",
-          gtin: "",
+          barCode: "",
           shortDescription: "",
         });
         navigate("/update-combo-product-step2/" + response?.data?.data?._id);
@@ -141,7 +141,7 @@ function ComboProductUpdateStep1() {
                   className="p-2 text-dark shadow rounded mb-4"
                   style={{ background: "#05E2B5" }}
                 >
-                  Update Combo Product : Step 1/3
+                  Update Combo Product : Step 1/2
                 </h4>
               </div>
               <div className="row">
@@ -204,16 +204,16 @@ function ComboProductUpdateStep1() {
             
 
                 <div className="col-6 mb-3">
-                  <label>GTIN Code*</label>
+                  <label>Bar Code*</label>
                   <input
                     className="form-control"
                     style={{ height: "45px" }}
-                    value={formData?.gtin || ""}
+                    value={formData?.barCode || ""}
                     required
                     onChange={(e) => {
                       const value = e.target.value;
                       if (/^\d*$/.test(value)) {
-                        setFormData({ ...formData, gtin: value });
+                        setFormData({ ...formData, barCode: value });
                       }
                     }}
                   />

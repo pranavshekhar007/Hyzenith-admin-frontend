@@ -30,7 +30,7 @@ function ProductUpdateAttribute() {
     try {
       const res = await getProductDetailsServ(params.id);
       if (res?.data?.statusCode === 200) {
-        const details = res.data.data?.productOtherDetails || [
+        const details = res.data.data?.product?.productOtherDetails || [
           { key: "", value: [""] },
         ];
         setProductOtherDetails(details);

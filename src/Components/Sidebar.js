@@ -59,6 +59,10 @@ function Sidebar({ selectedMenu, selectedItem }) {
           name: "Brands",
           path: "/brand-list"
         },
+         {
+          name: "Product Types",
+          path: "/product-type-list"
+        },
         {
           name: "Tags",
           path: "/tag-list",
